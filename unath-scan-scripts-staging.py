@@ -4,20 +4,22 @@ import time
 from zapv2 import ZAPv2
 import sys
 from urllib.parse import urlparse
+import os.path
 
 # The URL of the application to be tested
 #target = 'http://192.168.1.14:5000'
 # Change to match the API key set in ZAP, or use None if the API key is disabled
 apiKey = 'ronoskey'
 scanPolicyName='obb-ssrf'
-exclude_from_scan_regex = ['.*\.css$', '.*\.css$', '.*\.png$', '.*\.js$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$','.*\.ico$']
+#exclude_from_scan_regex = ['.*\.css$', '.*\.css$', '.*\.png$', '.*\.js$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$','.*\.ico$']
+exclude_from_scan_regex = ['.*\.css.*', '.*\.css.*', '.*\.png.*', '.*\.js.*', '.*\.gif.*', '.*\.jpg.*', '.*\.jpeg.*','.*\.ico.*','.*\.xvg.*']
 zap = ZAPv2(apikey=apiKey)
 
 def do_spider(target,contextname):
 	print('Spidering target {}'.format(target))
 	# The scan returns a scan id to support concurrent scanning
 	scanID1 = zap.spider.scan(target,contextname=contextname)
-	timeout = time.time() + 60*10 
+	timeout = time.time() + 60*4
 	while int(zap.spider.status(scanID1)) < 100:
 			# Poll the status until it completes
 			if time.time() > timeout:
@@ -58,6 +60,16 @@ def do_activescan(target,scanpolicyname):
 
 with open(sys.argv[1]) as f:
 	for target in f.read().splitlines():
+		o = urlparse(target)
+		target_scope = o.scheme + "://"+ o.netloc
+		target_scope_regx = target_scope + ".*"
+		
+		report_filename = './report_' + o.hostname + "__" + str(o.port) + '.html'
+		if os.path.isfile(report_filename) :
+			print('[-] report file ' + report_filename + ' already existed, skip target: ' + target)
+			continue
+		report_file = open(report_filename,"w")
+
 		print('[+] Testing target ' + target + '\n')
 		#create new session
 		zap.core.new_session(name="mySession", overwrite=True)
@@ -66,17 +78,14 @@ with open(sys.argv[1]) as f:
 		time.sleep(2)
 
 		#include target in Default Context
-		o = urlparse(target)
-		target_scope = o.scheme + "://"+ o.netloc
-		target_scope_regx = target_scope + ".*"
+
 		print(target_scope_regx)
 		zap.context.include_in_context(contextname="Default Context",regex=target_scope_regx)
 		#zap.context.include_in_context(contextname="Default Context",regex=target+".*")
 		do_ajaxscan(target_scope,'Default Context')
 		do_spider(target_scope,'Default Context')
 		do_activescan(target_scope,scanPolicyName)
-		report_filename = './report_' + o.hostname + "__" + str(o.port) + '.html'
-		report_file = open(report_filename,"w")
+
 		try:
 			report_file.write(zap.core.htmlreport())
 		except (RuntimeError, TypeError, NameError, UnicodeEncodeError):
