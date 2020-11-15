@@ -9,11 +9,15 @@ import os.path
 # The URL of the application to be tested
 #target = 'http://192.168.1.14:5000'
 # Change to match the API key set in ZAP, or use None if the API key is disabled
+
+
+localProxy={"http": "http://127.0.0.1:8081/", "https": "https://127.0.0.1:8081/"}
+
 apiKey = 'ronoskey'
 scanPolicyName='obb-ssrf'
-#exclude_from_scan_regex = ['.*\.css$', '.*\.css$', '.*\.png$', '.*\.js$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$','.*\.ico$']
-exclude_from_scan_regex = ['.*\.css.*', '.*\.css.*', '.*\.png.*', '.*\.js.*', '.*\.gif.*', '.*\.jpg.*', '.*\.jpeg.*','.*\.ico.*','.*\.xvg.*']
-zap = ZAPv2(apikey=apiKey)
+exclude_from_scan_regex = ['.*\.css$', '.*\.js$', '.*\.png$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$', '.*\.ico$', '.*\.xvg$', '.*\.css.*', '.*\.js?.*' ]
+#exclude_from_scan_regex = ['.*\.css*', '.*\.png.*', '.*\.js$', '.*\.gif.*', '.*\.jpg.*', '.*\.jpeg.*','.*\.ico.*','.*\.xvg.*']
+zap = ZAPv2(apikey=apiKey,proxies=localProxy)
 
 def do_spider(target,contextname):
 	print('Spidering target {}'.format(target))
