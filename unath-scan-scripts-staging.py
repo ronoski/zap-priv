@@ -15,7 +15,7 @@ import os.path
 localProxy={"http": "http://127.0.0.1:8080/", "https": "https://127.0.0.1:8080/"}
 apiKey = 'ronoskey'
 scanPolicyName='obb-ssrf'
-exclude_from_scan_regex = ['.*\.css$', '.*\.js$', '.*\.png$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$', '.*\.ico$', '.*\.xvg$', '.*\.css.*', '.*\.js?.*' ]
+exclude_from_scan_regex = ['.*\.css$', '.*\.js$', '.*\.png$', '.*\.gif$', '.*\.jpg$', '.*\.jpeg$', '.*\.ico$', '.*\.xvg$', '.*\.css.*', '.*\.js\?.*' ]
 #exclude_from_scan_regex = ['.*\.css*', '.*\.png.*', '.*\.js$', '.*\.gif.*', '.*\.jpg.*', '.*\.jpeg.*','.*\.ico.*','.*\.xvg.*']
 zap = ZAPv2(apikey=apiKey,proxies=localProxy)
 
