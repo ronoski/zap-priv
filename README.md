@@ -10,3 +10,6 @@
 ### 1.2 Signature-Based Detection
 - Payloads: `[127.0.0.1, localhost, http://127.0.0.1:21, http://127.0.0.1:1234]`
 - Positive detection: Error-indicated strings occur in the response. Example:  `Connection refused`
+
+### 1.3 Heuristic-Based Detection:
+- Technique: Compare Response Difference with difference payload
